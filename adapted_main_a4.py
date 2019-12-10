@@ -13,8 +13,7 @@ import en_core_web_sm
 #overrides max_length, doesn't seem to work?
 #nlp = en_core_web_sm.load(max_length=4000000)
 nlp = en_core_web_sm.load()
-
-
+nlp.max_length= 3199552
 # NLTK stoplist with 3136 words (multilingual)
 STOPLIST = set(nltk.corpus.stopwords.words())
 
