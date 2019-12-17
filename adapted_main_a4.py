@@ -105,7 +105,48 @@ class Text(object):
     def find_locs(self):
         doc = nlp(self.raw)
         duos = [(X.text, X.label_) for X in doc.ents if X.label_ in ('GPE','LOC','FAC')]
-        return duos 
+        return duos
+    
+    def unite_multiword_entities_into_one_token(self):
+        #use the nlp thing to get entities and tokenize
+        doc = nlp(self.raw)
+        #grabs all the entities that are labeled GPE
+        ents = [X for X in doc.ents if X.label_ == 'GPE']
+        newtokens = []
+        #index of the 'current' element of ents in the upcoming loop.
+        current = 0
+        #variable to represent the number of tokens to 'skip' if an entity's name is more than 1 word long
+        skip = 0
+        #traverse the document token by token
+        for j in range(len(doc)):
+            if skip > 0:
+                skip = skip - 1
+                continue
+            #split the current entity into its tokens.
+            tokenized_ent = ents[current].text.split(" ")
+            #get length of tokenized entity name.
+            length = len(tokenized_ent)
+            comparison = []
+            #this loop assembles a list of tokens the same length as the entity's name
+            #to compare it to the tokenized entity.
+            for i in range(length):
+                if j+i < len(doc):
+                    comparison.append(doc[j+i].text)
+            #If the entity is identical to the tokens of the text,
+            #join the tokens into one string and append them to the final token list with the GPE tag.
+            if tokenized_ent == comparison:
+                newtokens.append((" ".join(tokenized_ent), "GPE"))
+                #then advance to the next entity
+                current = current + 1
+                #if the entity is longer than 1 token, skip is set to the length - 1 to
+                #prevent the loop from adding subsequent tokens already included in the joined
+                #entity name
+                skip = length - 1
+            else:
+                #if the token list doesn't match, the first token is added to the token list with
+                #the tag "NO", indicating that it is not a part of a GPE.
+                newtokens.append((doc[j].text, "NO"))
+        return newtokens
 
     def concordance(self, word):
         self.text.concordance(word)
