@@ -3,6 +3,16 @@
 Script to generate heatmap images given a JSON file.
 
 Author: Angus L'Herrou
+
+Broken with current PIP repo. To run, install with conda in a fresh VENV:
+
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+conda install -y -c conda-forge libgdal
+conda install -y -c conda-forge gdal
+conda install -y -c conda-forge proj
+conda install -y -c conda-forge cartopy
+conda install -y -c conda-forge geoplot
 """
 
 import geopandas as gpd
@@ -15,11 +25,8 @@ import geoplot as gplt
 from geoplot import crs as gcrs
 import json
 import pickle
-from PIL import Image
 
 logging.captureWarnings(True)
-
-LOCATIONS = 'data/name_lat_long.json'
 
 
 def get_data(path, datatype='dataframe'):
@@ -50,33 +57,32 @@ def get_gdf(data, crs=4326):
     """
     Method to get the locations of all stations in the 'locations' file and store
     them in a GeoDataFrame as Points.
-    :param data:
+    :param data: a DataFrame with columns 'title', 'longitude', 'latitude'
     :param crs: the EPSG projection to use
-    :return: a GeoDataFrame with columns 'name', 'longitude', 'latitude', 'geometry'.
+    :return: a GeoDataFrame with columns 'title' and 'geometry'.
     """
-
     geometry = [Point(xy) for xy in zip(data['longitude'], data['latitude'])]
+    data = data.drop('longitude', axis=1).drop('latitude', axis=1)
     return gpd.geodataframe.GeoDataFrame(data,
                                          crs={'init': 'epsg:4326'},
-                                         geometry=geometry
+                                         geometry=geometry,
                                          ).to_crs(epsg=crs)
 
 
 def get_single_point(lat_long, crs=4326):
-    data = pd.DataFrame.from_dict({'name': ['origin']})
+    data = pd.DataFrame.from_dict({'title': ['origin'],
+                                   'geometry': [Point((lat_long[1], lat_long[0]))]})
     return gpd.geodataframe.GeoDataFrame(data,
                                          crs={'init': 'epsg:4326'},
-                                         geometry=[Point((lat_long[1], lat_long[0]))]
                                          ).to_crs(epsg=crs)
 
 
-def gen_map(name, path=LOCATIONS, datatype='dataframe', figsize=(16, 12), levels=25):
+def gen_map(path, datatype='dataframe', figsize=(16, 12), levels=25):
     """
     Generates a png file at maps/{name}.png with a heatmap of points in the JSON file at {path},
     projected onto the contiguous US using Albers Equal Area Projection.
-    :param levels:
-    :param datatype:
-    :param origin:
+    :param levels: the number of isolines to generate the heatmap with
+    :param datatype: how the data at 'path' is formatted. Leave as 'dataframe'.
     :param name: the name of the file before the .png extension
     :param path: the path where the JSON file is located
     :param figsize: the pyplot figure size of the plot. This determines the final resolution.
@@ -92,7 +98,7 @@ def gen_map(name, path=LOCATIONS, datatype='dataframe', figsize=(16, 12), levels
     title = points_df.title.location
     origin = (points_df.latitude.location, points_df.longitude.location)
     points_df = points_df.drop('location')
-    points = get_gdf(points_df, crs=4326)
+    heatmap_points = get_gdf(points_df, crs=4326)
 
     poly = gplt.polyplot(contig,
                          projection=gcrs.AlbersEqualArea(central_longitude=-98,
@@ -101,13 +107,29 @@ def gen_map(name, path=LOCATIONS, datatype='dataframe', figsize=(16, 12), levels
                          extent=us_extent,
                          zorder=1)
 
-    heatmap = gplt.kdeplot(points,
+    heatmap = gplt.kdeplot(heatmap_points,
                            clip=contig.geometry,
                            shade=True,
                            cmap='Purples',
                            extent=us_extent,
                            n_levels=levels,
                            ax=poly, zorder=0)
+
+    '''Strip points of duplicates for efficiency when drawing points'''
+
+    to_drop = []
+    places = set()
+
+    for row in points_df.iterrows():
+        place = row[1].title
+        if place in places:
+            to_drop.append(row[0])
+        places.add(place)
+
+    for item in to_drop:
+        points_df = points_df.drop(item)
+
+    points = get_gdf(points_df, crs=4326)
 
     gplt.pointplot(points, ax=poly, s=1, color='k',
                    extent=us_extent, zorder=2)
@@ -117,7 +139,8 @@ def gen_map(name, path=LOCATIONS, datatype='dataframe', figsize=(16, 12), levels
                    color='#ff7f0e', extent=us_extent, zorder=4)
 
     plt.title(f'Location mentions for {title}: Contiguous U.S.')
-    plt.savefig(f'maps/{name}.svg')
+    plt.savefig(f'maps/{title}.svg')
+
     # canvas = plt.get_current_fig_manager().canvas
     # canvas.draw()
     # size = canvas.get_width_height()
