@@ -91,7 +91,7 @@ def gen_map(name, path=LOCATIONS, datatype='dataframe', figsize=(16, 12), levels
     points_df: pd.DataFrame = get_data(path, datatype)
     title = points_df.title.location
     origin = (points_df.latitude.location, points_df.longitude.location)
-    points_df = points_df.drop('location').drop('title', axis=1)
+    points_df = points_df.drop('location')
     points = get_gdf(points_df, crs=4326)
 
     poly = gplt.polyplot(contig,
