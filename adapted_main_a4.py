@@ -58,7 +58,7 @@ class Text(object):
             self.raw = corpus.raw()
         self.text = nltk.text.Text(nltk.word_tokenize(self.raw))
 #        create tagged attribute using above POS class
-        self.tagged = PosTags(self.text)
+#        self.tagged = PosTags(self.text)
 
     def __len__(self):
         return len(self.text)
