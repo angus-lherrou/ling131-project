@@ -22,7 +22,7 @@ Generate the map in `maps/` by calling the following method from radiomap.py:
 ```python
 import radiomap
 
-radiomap.gen_map('wbur_locs.pkl')
+radiomap.gen_map("path/to/pickle.pkl")
 ```
 
 This will generate a file called `<location name>.svg` in `maps/`.
