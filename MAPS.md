@@ -5,10 +5,10 @@ Save the data for a given location (city, state, radio station, etc) as a pickle
 ```python
 import pandas as pd
 
-data = {'location': [<location name>, <lat>, <long>],
-        '0': [<mention 1 name>, <lat>, <long>],
-        '1': [<mention 2 name>, <lat>, <long>],
-        '2': [<mention 3 name>, <lat>, <long>], ...}
+data = {'location': [<location name>, <lat>, <lon>],
+        '0': [<mention 1 name>, <lat>, <lon>],
+        '1': [<mention 2 name>, <lat>, <lon>],
+        '2': [<mention 3 name>, <lat>, <lon>], ...}
 
 dataframe = pd.DataFrame.from_dict(data,
                        orient='index',
@@ -22,6 +22,8 @@ Generate the map in `maps/` by calling the following method from radiomap.py:
 ```python
 import radiomap
 
-radiomap.gen_map(name='WBUR', path='wbur_locs.pkl')
+radiomap.gen_map('wbur_locs.pkl')
 ```
+
+This will generate a file called `<location name>.svg` in `maps/`.
 
