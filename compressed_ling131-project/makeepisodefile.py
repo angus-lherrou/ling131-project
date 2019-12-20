@@ -1,4 +1,4 @@
-import gzip
+
 import json
 import os
 
@@ -9,10 +9,10 @@ def extract_show(folder):
             continue
         dates = set()
         try:
-            os.mkdir(folder + "/" + file[:file.index(".")].replace(" ", "_"))
+            os.mkdir(folder + "/" + file[:-5].replace(" ", "_"))
         except:
             pass
-        with gzip.open(folder+ "/" +file, 'rt') as f:
+        with open(folder + "/" +file, 'rt') as f:
             lines = f.readlines()
         for line in lines:
             if line[-1] == "\n" and line != "\n":
@@ -22,7 +22,7 @@ def extract_show(folder):
             else:
                 chunk_dict = json.loads(line)
             date = chunk_dict['audio_chunk_id'][:chunk_dict['audio_chunk_id'].index("/")]
-            filepath = folder + "/" + file[:file.index(".")].replace(" ", "_") + "/" + date + ".json"
+            filepath = folder + "/" + file[:-5].replace(" ", "_") + "/" + date + ".json"
             if date not in dates:
                 dates.add(date)
                 with open(filepath, 'wt') as f:
@@ -45,5 +45,12 @@ def extract_show(folder):
                 old_dict['content'] = old_dict['content'] + "\n" + chunk_dict['content']
                 with open(filepath, 'wt') as f:
                     f.write(json.dumps(old_dict))
-x = input("folder? ")
-extract_show(x)
+x = input("all folders? y/n: ")
+if x == "y":
+    folders = os.listdir()
+    for folder in folders:
+        if os.path.isdir(folder):
+            extract_show(folder)
+if x == "n":
+    folder = input("which one folder? ")
+    extract_show(folder)
