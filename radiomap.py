@@ -1,6 +1,6 @@
 """radiomap.py
 
-Script to generate heatmap images given a JSON file.
+Script to generate heatmap images given a pickled DataFrame.
 
 Author: Angus L'Herrou
 
