@@ -66,7 +66,7 @@ def gen_map(path, figsize=(16, 12), levels=25):
     :param levels: the number of isochrones to generate the heatmap with
     :param path: the path where the JSON file is located
     :param figsize: the pyplot figure size of the plot. This determines the final resolution.
-    :return: None; writes an image file to disk
+    :return: the file path where the map is
     """
     if not os.path.exists('maps'):
         os.mkdir('maps')
@@ -76,44 +76,48 @@ def gen_map(path, figsize=(16, 12), levels=25):
 
     points_df: pd.DataFrame = pd.read_pickle(path)
     title = points_df.title.location
-    origin = (points_df.latitude.location, points_df.longitude.location)
-    points_df = points_df.drop('location')
+    outpath = f'maps/{title}.png'
 
-    poly = gplt.polyplot(contig,
-                         projection=gcrs.AlbersEqualArea(central_longitude=-98,
-                                                         central_latitude=39.5),
-                         figsize=figsize,
-                         extent=us_extent,
-                         zorder=1)
+    if not os.path.exists(outpath):
+        origin = (points_df.latitude.location, points_df.longitude.location)
+        points_df = points_df.drop('location')
 
-    gplt.kdeplot(get_gdf(points_df, crs=4326),
-                 clip=contig.geometry,
-                 shade=True,
-                 cmap='viridis',
-                 shade_lowest=True,
-                 extent=us_extent,
-                 n_levels=levels,
-                 ax=poly, zorder=0)
+        poly = gplt.polyplot(contig,
+                             projection=gcrs.AlbersEqualArea(central_longitude=-98,
+                                                             central_latitude=39.5),
+                             figsize=figsize,
+                             extent=us_extent,
+                             zorder=1)
 
-    # Strip points of duplicates for svg size efficiency when drawing points
+        gplt.kdeplot(get_gdf(points_df, crs=4326),
+                     clip=contig.geometry,
+                     shade=True,
+                     cmap='viridis',
+                     shade_lowest=True,
+                     extent=us_extent,
+                     n_levels=levels,
+                     ax=poly, zorder=0)
 
-    to_drop = []
-    places = set()
+        # Strip points of duplicates for svg size efficiency when drawing points
 
-    for row in points_df.iterrows():
-        place = row[1].title
-        if place in places:
-            to_drop.append(row[0])
-        places.add(place)
+        # to_drop = []
+        # places = set()
+        #
+        # for row in points_df.iterrows():
+        #     place = row[1].title
+        #     if place in places:
+        #         to_drop.append(row[0])
+        #     places.add(place)
+        #
+        # for item in to_drop:
+        #     points_df = points_df.drop(item)
 
-    for item in to_drop:
-        points_df = points_df.drop(item)
+        gplt.pointplot(get_gdf(points_df, crs=4326), ax=poly, s=1, color='k',
+                       extent=us_extent, zorder=2)
 
-    gplt.pointplot(get_gdf(points_df, crs=4326), ax=poly, s=1, color='k',
-                   extent=us_extent, zorder=2)
+        gplt.pointplot(get_single_point(origin), ax=poly, marker='*', s=5,
+                       color='#ff7f0e', extent=us_extent, zorder=4)
 
-    gplt.pointplot(get_single_point(origin), ax=poly, marker='*', s=5,
-                   color='#ff7f0e', extent=us_extent, zorder=4)
-
-    plt.title(f'Location mentions for {title}: Contiguous U.S.')
-    plt.savefig(f'maps/{title}.svg')
+        plt.title(f'Location mentions for {title}: Contiguous U.S.')
+        plt.savefig(outpath)
+        return outpath
