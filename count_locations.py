@@ -1,6 +1,9 @@
 import os
 import json
 import pandas as pd
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
 
 
 def counts_by_show(direct):
@@ -14,7 +17,7 @@ def counts_by_show(direct):
 	with open(direct) as in_file:
 		show_data = json.load(in_file)
 
-	show_name = show_data[0]['show_name']	
+	show_name = show_data[0]['show_name']
 
 	for episode in show_data:
 
@@ -47,39 +50,36 @@ def counts_by_show(direct):
 	#percent out of U.S.
 	show_dict[show_name][8] = round(100 * (out_country/total_locs),2)
 
-
-	df = pd.DataFrame.from_dict(show_dict, 
+	df = pd.DataFrame.from_dict(show_dict,
 		orient='index',
 		columns=['Total Count','In State','In State %','Out of State','Out of State %','In US','In US %','Out of US','Out of US %'])
 	print(df)
 
 
 def counts_by_station(direct):
-	station_dict = {}	
+	station_dict = {}
 	total_locs = 0
 	in_state = 0
 	out_state = 0
 	in_country = 0
 	out_country = 0
-
-	with open(direct + os.listdir(direct)[1],'r') as in_file:
+	dirlist = [d for d in os.listdir(direct) if d.endswith('.json')]
+	with open(direct + '/' + dirlist[0], 'r') as in_file:
 		first_file = json.load(in_file)
 	first_ep = first_file[0]
 	ep_station = first_ep['station']
 
-	for file in os.listdir(direct):
-		if file.endswith('.json'):
-			with open(direct + file, 'r') as in_file:
-				show_data = json.load(in_file)
-			for episode in show_data:
-				total_locs += len(episode['locations'])
+	for file in dirlist:
+		with open(direct + '/' + file, 'r') as in_file:
+			show_data = json.load(in_file)
+		for episode in show_data:
+			total_locs += len(episode['locations'])
 
-				in_state += len(episode['in_state'])
-				out_state += len(episode['out_state'])
+			in_state += len(episode['in_state'])
+			out_state += len(episode['out_state'])
 
-				in_country += len(episode['in_country'])
-				out_country += len(episode['out_country'])
-
+			in_country += len(episode['in_country'])
+			out_country += len(episode['out_country'])
 
 	station_dict[ep_station] = [0] * 9
 
@@ -102,8 +102,7 @@ def counts_by_station(direct):
 	#percent out of U.S.
 	station_dict[ep_station][8] = round(100 * (out_country/total_locs),2)
 
-
-	df = pd.DataFrame.from_dict(station_dict, 
+	df = pd.DataFrame.from_dict(station_dict,
 		orient='index',
 		columns=['Total Count','In State','In State %','Out of State','Out of State %','In US','In US %','Out of US','Out of US %'])
 	print(df)

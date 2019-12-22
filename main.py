@@ -9,6 +9,7 @@ Author: Angus L'Herrou
 
 import os
 import radiomap
+import count_locations as cl
 
 if __name__ == '__main__':
     directory = 'compressed_ling131-project'
@@ -26,7 +27,7 @@ if __name__ == '__main__':
             station = input('> ').upper()
             directory = f'{directory}/{station}'
 
-        # TODO: print statistics about the current station
+        cl.counts_by_station(f'data/{station}')
 
         answer = ''
         print("Query a show in this station? (Y/n)")
