@@ -11,26 +11,57 @@ import os
 import radiomap
 
 if __name__ == '__main__':
-    pwd = 'compressed_ling131-project'
+    directory = 'compressed_ling131-project'
     level = ['station', 'show']
-    action = ['browse', 'query']
-    i = 0
-    q = False
 
-    while not q:
-        print(level[i].title()+'s:')
-        for d in os.listdir(pwd):
+    while True:
+        print('Stations:')
+        for d in os.listdir(directory):
             print('   ', d)
-        print(f'Select a {level[i]} to {action[i]}:')
-        if i == 0:
-            pwd += '/'+input('> ')
-        else:
-            show = input('> ')
-            path = f'{pwd}/{show}.pkl'
-            if not os.path.exists(path):
-                print("Bye")
-                break
-            outpath = radiomap.gen_map(path)
-            print(f'Map is ready at {outpath}')
-            q = True
-        i += 1
+        print('Select a station to query:')
+        station = input('> ').upper()
+        directory = f'{directory}/{station}'
+        while not os.path.isdir(directory):
+            print(f"No station called {station}! Try again:")
+            station = input('> ').upper()
+            directory = f'{directory}/{station}'
+
+        # TODO: print statistics about the current station
+
+        answer = ''
+        print("Query a show in this station? (Y/n)")
+        while answer.lower() not in {'y', 'n', 'yes', 'no'}:
+            response = input('> ')
+            answer = response if response else 'y'
+        if answer.lower().startswith('y'):
+            while True:
+                print(f'Shows in {station}:')
+                for d in os.listdir(directory):
+                    print('   ', d)
+                print()
+                print(f'Select a show in {station} to query:')
+                show = input('> ')
+
+                # TODO: print statistics about the current station
+
+                path = f'{directory}/{show}/{show}.pkl'
+                if not os.path.exists(path):
+                    # TODO: generate pickle
+                    raise Exception(f'No pickle at {path}!')
+                out_path = radiomap.gen_map(path)
+                print(f'Map is ready at {out_path}')
+                print()
+                answer = ''
+                print("Query another show? (Y/n)")
+                while answer.lower() not in {'y', 'n', 'yes', 'no'}:
+                    response = input('> ')
+                    answer = response if response else 'y'
+                if answer.lower().startswith('n'):
+                    break
+        answer = ''
+        print("Query another station? (Y/n)")
+        while answer.lower() not in {'y', 'n', 'yes', 'no'}:
+            response = input('> ')
+            answer = response if response else 'y'
+        if answer.lower().startswith('n'):
+            break

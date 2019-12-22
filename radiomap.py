@@ -61,7 +61,7 @@ def get_single_point(lat_long, crs=4326):
 
 def gen_map(path, figsize=(16, 12), levels=25):
     """
-    Generates an svg file at maps/{name}.svg with a heatmap of points in the JSON file at {path},
+    Generates a png file at maps/{name}.png with a heatmap of points in the JSON file at {path},
     projected onto the contiguous US using Albers Equal Area Projection.
     :param levels: the number of isochrones to generate the heatmap with
     :param path: the path where the JSON file is located
@@ -71,18 +71,18 @@ def gen_map(path, figsize=(16, 12), levels=25):
     if not os.path.exists('maps'):
         os.mkdir('maps')
 
-    contig = gpd.read_file(gplt.datasets.get_path('contiguous_usa'))
+    contiguous = gpd.read_file(gplt.datasets.get_path('contiguous_usa'))
     us_extent = (-125, 25, -66, 48)
 
     points_df: pd.DataFrame = pd.read_pickle(path)
     title = points_df.title.location
-    outpath = f'maps/{title}.png'
+    out_path = f'maps/{title}.png'
 
-    if not os.path.exists(outpath):
+    if not os.path.exists(out_path):
         origin = (points_df.latitude.location, points_df.longitude.location)
         points_df = points_df.drop('location')
 
-        poly = gplt.polyplot(contig,
+        poly = gplt.polyplot(contiguous,
                              projection=gcrs.AlbersEqualArea(central_longitude=-98,
                                                              central_latitude=39.5),
                              figsize=figsize,
@@ -90,7 +90,7 @@ def gen_map(path, figsize=(16, 12), levels=25):
                              zorder=1)
 
         gplt.kdeplot(get_gdf(points_df, crs=4326),
-                     clip=contig.geometry,
+                     clip=contiguous.geometry,
                      shade=True,
                      cmap='viridis',
                      shade_lowest=True,
@@ -119,5 +119,5 @@ def gen_map(path, figsize=(16, 12), levels=25):
                        color='#ff7f0e', extent=us_extent, zorder=4)
 
         plt.title(f'Location mentions for {title}: Contiguous U.S.')
-        plt.savefig(outpath)
-        return outpath
+        plt.savefig(out_path)
+        return out_path
