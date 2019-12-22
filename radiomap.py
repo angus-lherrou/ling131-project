@@ -8,10 +8,6 @@ Broken with current PIP repo. To run, install with conda in a fresh VENV:
 
 conda config --add channels conda-forge
 conda config --set channel_priority strict
-conda install -y -c conda-forge libgdal
-conda install -y -c conda-forge gdal
-conda install -y -c conda-forge proj
-conda install -y -c conda-forge cartopy
 conda install -y -c conda-forge geoplot
 """
 
@@ -59,13 +55,14 @@ def get_single_point(lat_long, crs=4326):
                                          ).to_crs(epsg=crs)
 
 
-def gen_map(path, figsize=(16, 12), levels=25):
+def gen_map(path, figsize=(16, 12), levels=25, force=False):
     """
     Generates a png file at maps/{name}.png with a heatmap of points in the JSON file at {path},
     projected onto the contiguous US using Albers Equal Area Projection.
-    :param levels: the number of isochrones to generate the heatmap with
     :param path: the path where the JSON file is located
     :param figsize: the pyplot figure size of the plot. This determines the final resolution.
+    :param levels: the number of isochrones to generate the heatmap with
+    :param force: if True, generate map even if it already exists
     :return: the file path where the map is
     """
     if not os.path.exists('maps'):
@@ -78,7 +75,7 @@ def gen_map(path, figsize=(16, 12), levels=25):
     title = points_df.title.location
     out_path = f'maps/{title}.png'
 
-    if not os.path.exists(out_path):
+    if force or not os.path.exists(out_path):
         origin = (points_df.latitude.location, points_df.longitude.location)
         points_df = points_df.drop('location')
 
@@ -98,8 +95,7 @@ def gen_map(path, figsize=(16, 12), levels=25):
                      n_levels=levels,
                      ax=poly, zorder=0)
 
-        # Strip points of duplicates for svg size efficiency when drawing points
-
+        """Deprecated: SVG optimizations"""
         # to_drop = []
         # places = set()
         #
