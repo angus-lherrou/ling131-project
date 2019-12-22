@@ -55,11 +55,11 @@ def get_single_point(lat_long, crs=4326):
                                          ).to_crs(epsg=crs)
 
 
-def gen_map(path, figsize=(16, 12), levels=25, force=False):
+def gen_map(points_df, figsize=(16, 12), levels=25, force=False):
     """
     Generates a png file at maps/{name}.png with a heatmap of points in the JSON file at {path},
     projected onto the contiguous US using Albers Equal Area Projection.
-    :param path: the path where the JSON file is located
+    :param points_df: the dataframe of location coordinates
     :param figsize: the pyplot figure size of the plot. This determines the final resolution.
     :param levels: the number of isochrones to generate the heatmap with
     :param force: if True, generate map even if it already exists
@@ -71,7 +71,6 @@ def gen_map(path, figsize=(16, 12), levels=25, force=False):
     contiguous = gpd.read_file(gplt.datasets.get_path('contiguous_usa'))
     us_extent = (-125, 25, -66, 48)
 
-    points_df: pd.DataFrame = pd.read_pickle(path)
     title = points_df.title.location
     out_path = f'maps/{title}.png'
 
