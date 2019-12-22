@@ -86,19 +86,10 @@ def find_coords(loc_list):
 
 def create_df(coord_list, ep):
     ep_sta = ep['station']
-    ep_loc = ep['city'] + ', ' + ep['state']
-    if ep_loc not in geonames_data.keys():
-        geo_loc = geocoder.geonames(ep_loc, key='krajovic')
-        geonames_data[ep_loc] = {}
-        geonames_data[ep_loc]['state'] = geo_loc.state
-        geonames_data[ep_loc]['country'] = geo_loc.country
-        geonames_data[ep_loc]['coords'] = geo_loc.latlng
+    ep_loc = ep['ep_coords']
 
-    ep_coords = geonames_data[ep_loc]['coords']
-
-    ep_lat = float(ep_coords[0])
-    ep_long = float(ep_coords[1])
-
+    ep_lat = float(ep['ep_coords'][1])
+    ep_long = float(ep['ep_coords'][2])
 
     loc_df = {'location': [ep_sta, ep_lat, ep_long]}
 
@@ -148,8 +139,20 @@ def get_data(infile, outpath):
     episode['locations'] = loc_coords
     episode['not_found'] = not_found
     
+    ep_loc = episode['city'] + ', ' + episode['state']
 
-    
+    if ep_loc not in geonames_data.keys():
+        ep_geo = geocoder.geonames(ep_loc, key='krajovic')
+        geonames_data[ep_loc] = {}
+        geonames_data[ep_loc]['state'] = ep_geo.state
+        geonames_data[ep_loc]['country'] = ep_geo.country
+        geonames_data[ep_loc]['coords'] = ep_geo.latlng
+
+    ep_lat = float(geonames_data[ep_loc]['coords'][0])
+    ep_long = float(geonames_data[ep_loc]['coords'][1])
+
+    episode['ep_coords']= (ep_loc, ep_lat, ep_long)
+
     in_c, out_c, in_s, out_s = in_state(loc_coords,episode)
     
     episode['in_country'] = in_c
@@ -165,4 +168,3 @@ def get_data(infile, outpath):
     with open(jsonpath, 'a') as out_file:
         json.dump(episode, out_file)
     return
-
