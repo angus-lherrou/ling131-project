@@ -13,11 +13,11 @@ import radiomap
 if __name__ == '__main__':
     directory = 'compressed_ling131-project'
     level = ['station', 'show']
-
     while True:
         print('Stations:')
         for d in os.listdir(directory):
-            print('   ', d)
+            if os.path.isdir(directory+'/'+d):
+                print('   ', d)
         print('Select a station to query:')
         station = input('> ').upper()
         directory = f'{directory}/{station}'
@@ -36,11 +36,14 @@ if __name__ == '__main__':
         if answer.lower().startswith('y'):
             while True:
                 print(f'Shows in {station}:')
-                for d in os.listdir(directory):
-                    print('   ', d)
+                show_list = []
+                for i, show_dir in enumerate([d for d in os.listdir(directory)
+                                       if os.path.isdir(directory + '/' + d)]):
+                    print(f'{i:>4}  {show_dir}')
+                    show_list.append(show_dir)
                 print()
-                print(f'Select a show in {station} to query:')
-                show = input('> ')
+                print(f'Select a show index in {station} to query:')
+                show = show_list[int(input('> '))]
 
                 # TODO: print statistics about the current station
 
