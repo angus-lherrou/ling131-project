@@ -63,14 +63,18 @@ def counts_by_station(direct):
 	out_state = 0
 	in_country = 0
 	out_country = 0
-	dirlist = [d for d in os.listdir(direct) if d.endswith('.json')]
-	with open(direct + '/' + dirlist[0], 'r') as in_file:
+
+	show_list = [d for d in os.listdir(direct) if os.path.isdir(direct + '/' + d)]
+	show_dir = [(direct + '/' + show + '/' + show + '.json') for show in show_list 
+					if os.path.isfile(direct + '/' + show + '/' + show + '.json')]
+
+	with open(show_dir[0], 'r') as in_file:
 		first_file = json.load(in_file)
 	first_ep = first_file[0]
 	ep_station = first_ep['station']
 
-	for file in dirlist:
-		with open(direct + '/' + file, 'r') as in_file:
+	for file in show_dir:	
+		with open(file, 'r') as in_file:
 			show_data = json.load(in_file)
 		for episode in show_data:
 			total_locs += len(episode['locations'])
@@ -106,3 +110,4 @@ def counts_by_station(direct):
 		orient='index',
 		columns=['Total Count','In State','In State %','Out of State','Out of State %','In US','In US %','Out of US','Out of US %'])
 	print(df)
+	

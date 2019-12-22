@@ -10,6 +10,7 @@ Author: Angus L'Herrou
 import os
 import radiomap
 import count_locations as cl
+import create_dataframe as cdf
 
 if __name__ == '__main__':
     directory = 'compressed_ling131-project'
@@ -29,6 +30,11 @@ if __name__ == '__main__':
 
         cl.counts_by_station(f'data/{station}')
 
+        map_df = cdf.make_station_df(f'data/{station}')
+        out_path = radiomap.gen_map(map_df)
+        print(f'Map is ready at {out_path}')
+        print()
+
         answer = ''
         print("Query a show in this station? (Y/n)")
         while answer.lower() not in {'y', 'n', 'yes', 'no'}:
@@ -46,13 +52,10 @@ if __name__ == '__main__':
                 print(f'Select a show index in {station} to query:')
                 show = show_list[int(input('> '))]
 
-                # TODO: print statistics about the current station
+                cl.counts_by_show(f'data/{station}/{show}/{show}.json')
 
-                path = f'{directory}/{show}/{show}.pkl'
-                if not os.path.exists(path):
-                    # TODO: generate pickle
-                    raise Exception(f'No pickle at {path}!')
-                out_path = radiomap.gen_map(path)
+                show_map_df = cdf.make_show_df(f'data/{station}/{show}/{show}.json')
+                out_path = radiomap.gen_map(show_map_df)
                 print(f'Map is ready at {out_path}')
                 print()
                 answer = ''
