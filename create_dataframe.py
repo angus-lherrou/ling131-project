@@ -1,6 +1,8 @@
+"""This script makes a dataframe of latitudes and longitudes given a file path,
+either by radio show or by radio station. """
+
 import os
 import json
-import pickle
 import pandas as pd
 
 
@@ -8,6 +10,7 @@ def make_show_df(direct):
     loc_df = {}
     all_locs = []
 
+    #find location of show
     with open(direct) as in_file:
         show_data = json.load(in_file)
     first_ep = show_data[0]
@@ -16,14 +19,17 @@ def make_show_df(direct):
     ep_long = float(ep_loc[2])
     loc_df['location'] = [first_ep['show_name'],ep_lat,ep_long]
 
+    #compile all locations
     for episode in show_data:
         all_locs += episode['locations']
 
+    #add locations to dictionary
     for i in range(len(all_locs)):
         loc = all_locs[i]
         if type(loc) == list:
             loc_df[str(i)] = [loc[0],loc[1],loc[2]]
 
+    #create pandas dataframe
     df_for_map = pd.DataFrame.from_dict(loc_df, 
                     orient='index',
                     columns=['title', 'latitude', 'longitude'])
@@ -39,6 +45,7 @@ def make_station_df(direct):
     show_dir = [(direct + '/' + show + '/' + show + '.json') for show in show_list 
                            if os.path.isfile(direct + '/' + show + '/' + show + '.json')]
 
+    #find location of station
     with open(show_dir[0],'r') as in_file:
         first_file = json.load(in_file)
     first_ep = first_file[0]
@@ -47,17 +54,20 @@ def make_station_df(direct):
     ep_long = float(ep_loc[2])
     loc_df['location'] = [first_ep['station'],ep_lat,ep_long]
 
+    #compile locations
     for file in show_dir:
         with open(file, 'r') as in_file:
             show_data = json.load(in_file)
         for episode in show_data:
             all_locs += episode['locations']
 
+    #add locations to dict
     for i in range(len(all_locs)):
         loc = all_locs[i]
         if type(loc) == list:
             loc_df[str(i)] = [loc[0],loc[1],loc[2]]
 
+    #create pandas dataframe
     df_for_map = pd.DataFrame.from_dict(loc_df,
                     orient='index',
                     columns=['title', 'latitude', 'longitude'])
