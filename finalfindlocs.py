@@ -18,13 +18,7 @@ STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Conne
 
 
 
-if os.path.exists('geonamesobjs.pkl'):
-    with open('geonamesobjs.pkl','rb') as in_data:
-        geonames_data = pickle.load(in_data)
 
-
-else:
-    geonames_data = {}
 
 
 def find_locs(string):
@@ -33,7 +27,7 @@ def find_locs(string):
     return duos 
 
 
-def city_in_state(li):
+def city_in_state(geonames_data, li):
     i = 1
     while i < len(li):
         if li[i] in STATES:
@@ -53,22 +47,35 @@ def city_in_state(li):
                 li.pop(i)
                 i -= 1
         i += 1
+    return geonames_data
 
-
-def find_coords(loc_list):
+def find_coords(geonames_data, loc_list):
     coord_list = []
-    not_found = []
+    if os.path.exists('notfound.pkl'):
+        with open('notfound.pkl','rb') as in_data:
+            not_found  = pickle.load(in_data)
+    else:
+        not_found = []
     for loc in loc_list:
-        if loc in geonames_data.keys():
+        if loc in geonames_data.keys(): 
             geo_loc = geonames_data[loc]
             latlong = geo_loc['coords']
             if latlong:
                 geo_info = (loc, float(latlong[0]), float(latlong[1]))
                 coord_list.append(geo_info)
             else:
-                not_found.append(loc)
+                not_found.append(loc.lower())
+                continue
         else:
+            if loc.lower() in not_found:
+                continue
+            print (loc)
             geo_loc = geocoder.geonames(loc, key='krajovic')
+            try:
+                if geo_loc.value == 19:
+                    return None, None
+            except AttributeError:
+                None
             if geo_loc.latlng:
                 geonames_data[loc] = {}
                 geonames_data[loc]['state'] = geo_loc.state
@@ -79,8 +86,8 @@ def find_coords(loc_list):
                 geo_info = (loc, float(latlong[0]), float(latlong[1]))
                 coord_list.append(geo_info)
             else:
-                not_found.append(loc)
-    return coord_list, not_found
+                not_found.append(loc.lower())
+    return geonames_data, coord_list, not_found
 
 
 def create_df(coord_list, ep):
@@ -103,7 +110,7 @@ def create_df(coord_list, ep):
 
     return dataframe
 
-def in_state(loc_list, ep):
+def in_state(geonames_data, loc_list, ep):
     ep_loc = ep['city'] + ', ' + ep['state']
     ep_state = geonames_data[ep_loc]['state']
     in_country = []
@@ -127,14 +134,22 @@ def in_state(loc_list, ep):
     
 
 def get_data(infile, outpath):
+    if os.path.exists('geonamesobjs.pkl'):
+        with open('geonamesobjs.pkl','rb') as in_data:
+            geonames_data = pickle.load(in_data)
+        print (len(geonames_data.keys()))
+    else:
+         geonames_data = {}
     with open(infile,'r') as infile:
         episode = json.load(infile)
 
     ep_text = episode['content']
     ep_loc_list = find_locs(ep_text)
-    city_in_state(ep_loc_list)
+    geonames_data = city_in_state(geonames_data, ep_loc_list)
     
-    loc_coords, not_found = find_coords(ep_loc_list)
+    geonames_data, loc_coords, not_found = find_coords(geonames_data, ep_loc_list)
+    if loc_coords == None:
+        return 0
     
     episode['locations'] = loc_coords
     episode['not_found'] = not_found
@@ -158,14 +173,14 @@ def get_data(infile, outpath):
 
     episode['ep_coords']= (ep_loc, ep_lat, ep_long)
 
-    in_c, out_c, in_s, out_s = in_state(loc_coords,episode)
+    in_c, out_c, in_s, out_s = in_state(geonames_data, loc_coords, episode)
     
     episode['in_country'] = in_c
     episode['out_country'] = out_c
     episode['in_state'] = in_s
     episode['out_state'] = out_s
     
-    with open('geonamesobjs.pkl', 'ab') as geo_dict:
+    with open('geonamesobjs.pkl', 'wb') as geo_dict:
         pickle.dump(geonames_data, geo_dict)
     
     outfile = os.path.split(outpath)[1] + '.json'

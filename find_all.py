@@ -29,19 +29,22 @@ def traverse_dir():
                 if not os.path.exists(savedir):
                     os.mkdir(savedir)
                 infolder = os.path.join(INPATH, folder, subfolder)
+                episode_count = 0
                 for filename in os.listdir(infolder):
-                    infile = os.path.join(infolder, filename)
-                    if filename.endswith('.gz'):
-                        continue
-                    t0 = time.time()                   
-                    x = fl.get_data(infile, savedir)
-                    if x == 0:
-                        return
-                    t1 = time.time()
-                    counter += 1
-                    print(counter)
-                    with open('read.txt', 'a') as f:
-                        f.write(os.path.join(infolder, filename) + ":" + str(t1-t0) + ":\n")
+                    if episode_count < 5:
+                        infile = os.path.join(infolder, filename)
+                        if filename.endswith('.gz'):
+                            continue
+                        t0 = time.time()                   
+                        x = fl.get_data(infile, savedir)
+                        if x == 0:
+                            return
+                        t1 = time.time()
+                        counter += 1
+                        print(counter)
+                        with open('read.txt', 'a') as f:
+                            f.write(os.path.join(infolder, filename) + ":" + str(t1-t0) + ":\n")
+                        episode_count += 1
     return
                    
 if not os.path.exists(OUTPATH):
