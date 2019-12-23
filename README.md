@@ -28,7 +28,7 @@ To run our main script, set up a clean Conda Python 3.7 interpreter and run the 
   $ python main.py
 ```
 
-The main script will ask the user to choose a radio station, and will print the number of total locations mentioned, how many were inside and outside the state, how many were inside and outside the U.S., and the percentages for each of these. It also outputs a heatmap into the /maps/ directory. 
+The main script will ask the user to choose a radio station, and will print the number of total locations mentioned, how many were inside and outside the state, how many were inside and outside the U.S., and the percentages for each of these. It also outputs a heatmap into the /maps/ directory. It then asks if the user would like to access the same information for one of the station's shows, and proceeds accordingly.
 
 #### Project Presentation  
 https://docs.google.com/presentation/d/1GB_f5kugE6EfKw064cTWvjeSPfuPjTaVbMl1ayRMAWs/edit#slide=id.g6c2b65194f_1_13
