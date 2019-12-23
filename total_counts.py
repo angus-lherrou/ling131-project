@@ -106,7 +106,7 @@ def counts_by_station(direct):
                                         longs.append(entry[2])
 		
 		sigmalat = numpy.std(lats)
-                sigmalong = numpy.std(longs)
+		sigmalong = numpy.std(longs)
 		sta_count_dict[station][16] = round(sigmalat * sigmalong * math.pi)
 
 
