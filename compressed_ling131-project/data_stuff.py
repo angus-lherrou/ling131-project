@@ -1,3 +1,4 @@
+#data_stuff was used to generate data about the content of WBUR for our presentation in class.
 from adapted_main_a4 import Text
 import nltk
 import os
@@ -5,19 +6,19 @@ import pickle
 import gzip
 import json
 from collections import defaultdict
-if not os.path.isfile("pickledtokencts"):
-    if os.path.isfile("pickledtokencts"):
-        with open("pickledtokencts", "rb") as f:
-            counts_rawtokens_telephone_female = pickle.load(f)
-    else:
-        shows = os.listdir("WBUR_shownames")
-        counts_rawtokens_telephone_female = defaultdict(list)
-        for file in shows:
-            dummy = Text("WBUR_shownames/" + file )
-            counts_rawtokens_telephone_female[file] = [len(dummy)]
 
-        with open("pickledtokencts", "wb") as f:
-            pickle.dump(counts_rawtokens_telephone_female, f)
+if os.path.isfile("pickledtokencts"):
+    with open("pickledtokencts", "rb") as f:
+        counts_rawtokens_telephone_female = pickle.load(f)
+else:
+    shows = os.listdir("WBUR_shownames")
+    counts_rawtokens_telephone_female = defaultdict(list)
+    for file in shows:
+        dummy = Text("WBUR_shownames/" + file )
+        counts_rawtokens_telephone_female[file] = [len(dummy)]
+
+    with open("pickledtokencts", "wb") as f:
+        pickle.dump(counts_rawtokens_telephone_female, f)
 
     shows_female_tkncounts = defaultdict(int)
     shows_telephone_tkncounts = defaultdict(int)
