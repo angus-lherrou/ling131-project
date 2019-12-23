@@ -38,3 +38,6 @@ https://towardsdatascience.com/named-entity-recognition-with-nltk-and-spacy-8c4a
 
 #### Map generation tutorial  
 [MAPS.md](MAPS.md)
+
+### RadioTalk corpus
+https://github.com/social-machines/RadioTalk
