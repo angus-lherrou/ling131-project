@@ -1,4 +1,6 @@
-
+'''This script took files containing dictionaries representing audio chunks from a single show on a single station
+and wrote them into separate files based on the day the chunk was aired. It also removed unnecessary meta-data, and 
+wrote the entire day's worth of chunks from the show into one dictionary.
 import json
 import os
 
