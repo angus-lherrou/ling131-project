@@ -22,4 +22,12 @@ $ python main.py
 
 #### Required Packages
 
-Our main script also requires the following to run:
+Our main script requires the following packages to run:
+* `geopandas`
+* `geoplot`
+* `json`
+* `logging`
+* `matplotlib`
+* `os`
+* `pandas`
+* `shapely`
