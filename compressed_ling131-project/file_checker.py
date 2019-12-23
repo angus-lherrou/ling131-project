@@ -1,3 +1,5 @@
+'''This script was just used to make sure that no extra files were lingering in the wrong places of the corpus during 
+our restructuring of the data.'''
 import os
 
 folders = os.listdir()
