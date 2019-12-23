@@ -4,6 +4,7 @@ of counts and percentages of location mentions, relative to the location of the 
 import os
 import json
 import pandas as pd
+import numpy
 
 
 def counts_by_station(direct):
@@ -21,6 +22,10 @@ def counts_by_station(direct):
 
 		show_dir = [(sta_path + '/' + show + '/' + show + '.json') for show in show_list 
 					if os.path.isfile(sta_path + '/' + show + '/' + show + '.json')]
+		
+		#make lists of latitudes and longitudes for a station.
+		lats = []
+		longs = []
 		
 		#get station location from first episode
 		with open(show_dir[0],'r') as show:
@@ -93,11 +98,21 @@ def counts_by_station(direct):
 				#find % of tokens out-of-country locs
 				out_country_tok = round(100 * (sta_count_dict[station][13]/sta_count_dict[station][1]),2)
 				sta_count_dict[station][15] = out_country_tok
+				
+				#add the locations' longitudes and latitudes to the appropriate lists
+				for entry in episode['locations']:
+                                    if entry[1] != None and entry[2] != None:
+                                        lats.append(entry[1])
+                                        longs.append(entry[2])
+		
+		sigmalat = numpy.std(lats)
+                sigmalong = numpy.std(longs)
+		sta_count_dict[16] = round(sigmalat * sigmalong * math.pi)
 
 
 	df = pd.DataFrame.from_dict(sta_count_dict, 
 			orient='index',
-			columns=['Station Location','Token Count','Location Count','Location %','In State','In State % Loc','In State % Tok','Out of State','Out of State % Loc','Out of State % Tok','In US','In US % Loc','In US % Tok','Out of US','Out of US % Loc','Out of US % Tok'])
+			columns=['Station Location','Token Count','Location Count','Location %','In State','In State % Loc','In State % Tok','Out of State','Out of State % Loc','Out of State % Tok','In US','In US % Loc','In US % Tok','Out of US','Out of US % Loc','Out of US % Tok','Dispersion'])
 	
 	return df
 
