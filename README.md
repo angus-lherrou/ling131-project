@@ -15,10 +15,12 @@ https://towardsdatascience.com/named-entity-recognition-with-nltk-and-spacy-8c4a
 
 To run our main script, set up a clean Conda Python 3.7 interpreter and run the following:
 
+```
   $ conda config --add channels conda-forge
   $ conda config --set channel_priority strict
   $ conda install -y -c conda-forge geoplot
   $ python main.py
+```
 
 #### Required Packages
 
