@@ -141,8 +141,6 @@ def get_json_array(path):
     return json_arr
 
 
-
-
 # Get location data
 def get_data(infile, outpath):
     geonames_data = get_geonames_dict('geonamesobj.pkl')
