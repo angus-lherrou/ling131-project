@@ -16,7 +16,7 @@ def counts_by_station(direct):
 	#for each station, count tokens, loc mentions, and percentages
 	for station in sta_list:
 		sta_path = direct + '/' + station
-		sta_count_dict[station] = [0] * 16
+		sta_count_dict[station] = [0] * 17
 
 		show_list = [show for show in os.listdir(sta_path) if os.path.isdir(sta_path + '/' + show)]
 
