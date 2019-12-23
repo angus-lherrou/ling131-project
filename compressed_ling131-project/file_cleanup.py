@@ -1,3 +1,4 @@
+'''This script was used to remove unnecessary files during corpus data restructuring'''
 import os
 
 folders = os.listdir()
