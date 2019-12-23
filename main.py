@@ -13,9 +13,9 @@ import count_locations as cl
 import create_dataframe as cdf
 
 if __name__ == '__main__':
-    directory = 'compressed_ling131-project'
     level = ['station', 'show']
     while True:
+        directory = 'data'
         print('Stations:')
         for d in os.listdir(directory):
             if os.path.isdir(directory+'/'+d):
