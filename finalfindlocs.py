@@ -41,13 +41,15 @@ def catch_exceed_error(gn_obj):
     except AttributeError:
         return None
    
-   
+
+'''Identify place names in Named Entities'''          
 def find_locs(string):
     doc = nlp(string)
     duos = [X.text for X in doc.ents if X.label_ == 'GPE']
     return duos 
 
 
+'''Determine if city is in station state'''
 def city_in_state(geonames_data, li):
     i = 1
     while i < len(li):
@@ -75,10 +77,8 @@ def get_not_found_locs(path):
     return []
 
 
-'''
-Find coordinates for locations in a list of identifies place names.
-Inputs: geonames dictionary, list of place names
-'''
+'''Find coordinates for locations in a list of identifies place names.
+Inputs: geonames dictionary, list of place names. '''
 def find_coords(geonames_data, loc_list):
     coord_list = []
     not_found = get_not_found_locs('notfound.pkl')
@@ -108,6 +108,7 @@ def find_coords(geonames_data, loc_list):
     return geonames_data, coord_list, not_found
 
 
+'''Determine if location is in station state'''
 def in_state(geonames_data, loc_list, ep):
     ep_loc = ep['city'] + ', ' + ep['state']
     ep_state = geonames_data[ep_loc]['state']
@@ -131,7 +132,7 @@ def in_state(geonames_data, loc_list, ep):
     return in_country, out_country, in_state, out_state
 
 
-# Read in the json array for the show
+'''Read in the json array for the show'''
 def get_json_array(path):
     if os.path.exists(path):
          with open(jsonpath, 'r') as f:
@@ -141,7 +142,7 @@ def get_json_array(path):
     return json_arr
 
 
-# Get location data
+'''Get location data'''
 def get_data(infile, outpath):
     geonames_data = get_geonames_dict('geonamesobj.pkl')
 
