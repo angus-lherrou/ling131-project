@@ -1,3 +1,6 @@
+"""This script runs through all shows and stations in the data folder, and returns a csv
+of counts and percentages of location mentions, relative to the location of the station."""
+
 import os
 import json
 import pandas as pd
