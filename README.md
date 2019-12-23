@@ -9,3 +9,17 @@ https://towardsdatascience.com/named-entity-recognition-with-nltk-and-spacy-8c4a
 
 #### Map generation tutorial  
 [MAPS.md](MAPS.md)
+
+
+#### Running the main script
+
+To run our main script, set up a clean Conda Python 3.7 interpreter and run the following:
+
+$ conda config --add channels conda-forge
+$ conda config --set channel_priority strict
+$ conda install -y -c conda-forge geoplot
+$ python main.py
+
+#### Required Packages
+
+Our main script also requires the following to run:
