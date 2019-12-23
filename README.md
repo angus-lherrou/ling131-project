@@ -5,6 +5,8 @@ final project by angus, dom, james, katie, and miriam
 
 This project examines a corpus of transcribed radio data for trends in mentioned locations relative to the location of the radio station. The corpus is built using the RadioTalk corpus, `spacy`, and `geonames`.
 
+Final report is in ProjectReport.pdf.
+
 #### Required Packages
 
 Our main script requires the following packages to run:
