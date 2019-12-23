@@ -115,4 +115,4 @@ def gen_map(points_df, figsize=(16, 12), levels=25, force=False):
 
         plt.title(f'Location mentions for {title}: Contiguous U.S.')
         plt.savefig(out_path)
-        return out_path
+    return out_path

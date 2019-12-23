@@ -17,16 +17,16 @@ if __name__ == '__main__':
     while True:
         directory = 'data'
         print('Stations:')
-        for d in os.listdir(directory):
+        for d in sorted(os.listdir(directory)):
             if os.path.isdir(directory+'/'+d):
                 print('   ', d)
         print('Select a station to query:')
         station = input('> ').upper()
-        directory = f'{directory}/{station}'
+        directory = f'data/{station}'
         while not os.path.isdir(directory):
             print(f"No station called {station}! Try again:")
             station = input('> ').upper()
-            directory = f'{directory}/{station}'
+            directory = f'data/{station}'
 
         cl.counts_by_station(f'data/{station}')
 
@@ -44,8 +44,8 @@ if __name__ == '__main__':
             while True:
                 print(f'Shows in {station}:')
                 show_list = []
-                for i, show_dir in enumerate([d for d in os.listdir(directory)
-                                       if os.path.isdir(directory + '/' + d)]):
+                for i, show_dir in enumerate([d for d in sorted(os.listdir(directory))
+                                             if os.path.isdir(directory + '/' + d)]):
                     print(f'{i:>4}  {show_dir}')
                     show_list.append(show_dir)
                 print()
