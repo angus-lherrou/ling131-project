@@ -107,7 +107,7 @@ def counts_by_station(direct):
 		
 		sigmalat = numpy.std(lats)
 		sigmalong = numpy.std(longs)
-		sta_count_dict[station][16] = round(sigmalat * sigmalong * math.pi)
+		sta_count_dict[station][16] = int(round(sigmalat * sigmalong * math.pi))
 
 
 	df = pd.DataFrame.from_dict(sta_count_dict, 
